@@ -5,10 +5,12 @@
  * - Qwik bundles (/build, /assets): hashed, so cache first. Every bundle in
  *   q-manifest.json is precached so the whole app works offline after the
  *   first visit, and re-synced whenever the manifest hash changes.
- * - Fonts and other static files: stale-while-revalidate.
+ * - Self-hosted fonts (/fonts): immutable files listed in /fonts/index.json,
+ *   precached so every glyph slice works offline; cache first.
+ * - Other static files: stale-while-revalidate.
  */
 
-const CACHE = "manga-spell-v2";
+const CACHE = "manga-spell-v3";
 const PAGES = ["/", "/play/", "/map/"];
 const STATIC = [
   "/manifest.json",
@@ -17,6 +19,18 @@ const STATIC = [
   "/icons/icon-192.png",
   "/icons/icon-512.png",
 ];
+
+async function precacheFonts() {
+  const cache = await caches.open(CACHE);
+  const res = await fetch("/fonts/index.json");
+  if (!res.ok) return;
+  const files = (await res.json()).map((f) => `/fonts/${f}`);
+  const missing = [];
+  for (const url of files) {
+    if (!(await cache.match(url))) missing.push(url);
+  }
+  await cache.addAll(missing);
+}
 
 async function syncBundles() {
   const cache = await caches.open(CACHE);
@@ -52,6 +66,7 @@ self.addEventListener("install", (event) => {
       const cache = await caches.open(CACHE);
       await cache.addAll([...PAGES, ...STATIC]);
       await syncBundles();
+      await precacheFonts().catch(() => undefined);
       await self.skipWaiting();
     })(),
   );
@@ -122,12 +137,15 @@ self.addEventListener("fetch", (event) => {
   const { request } = event;
   if (request.method !== "GET") return;
   const url = new URL(request.url);
-  const fonts = url.host === "fonts.googleapis.com" || url.host === "fonts.gstatic.com";
-  if (url.origin !== self.location.origin && !fonts) return;
+  if (url.origin !== self.location.origin) return;
 
   if (request.mode === "navigate") {
     event.respondWith(networkFirst(event));
-  } else if (url.pathname.startsWith("/build/") || url.pathname.startsWith("/assets/")) {
+  } else if (
+    url.pathname.startsWith("/build/") ||
+    url.pathname.startsWith("/assets/") ||
+    url.pathname.startsWith("/fonts/")
+  ) {
     event.respondWith(cacheFirst(request));
   } else if (url.pathname !== "/sw.js") {
     event.respondWith(staleWhileRevalidate(event));

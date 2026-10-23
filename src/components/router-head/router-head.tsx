@@ -1,9 +1,6 @@
 import { component$ } from "@builder.io/qwik";
 import { useDocumentHead, useLocation } from "@builder.io/qwik-city";
 
-const FONTS =
-  "https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=M+PLUS+Rounded+1c:wght@500;700;800&family=Mochiy+Pop+One&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap";
-
 /**
  * The RouterHead component is placed inside of the document `<head>` element.
  */
@@ -30,9 +27,6 @@ export const RouterHead = component$(() => {
       />
       <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
       <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-      <link rel="stylesheet" href={FONTS} />
 
       {head.meta.map((m) => (
         <meta key={m.key} {...m} />

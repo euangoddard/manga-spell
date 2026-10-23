@@ -4,6 +4,7 @@ import { RouterHead } from "./components/router-head/router-head";
 import { THEME_BOOT_SCRIPT } from "./lib/settings";
 import { AUDIO_UNLOCK_SCRIPT } from "./lib/sfx";
 
+import "./fonts.css";
 import "./global.css";
 
 /** Registers the offline service worker in production builds */

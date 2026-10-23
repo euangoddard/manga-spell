@@ -14,6 +14,7 @@ Spelling-test PWA for the English statutory word lists (Years 3–6), built with
 - `src/data/words.ts` — word lists; word families (e.g. eight / eighth) count as one entry
 - `src/lib/` — `settings.ts` and `progress.ts` (both `localStorage`, keys prefixed `manga-spell:`)
 - `src/components/` — `mochi`, `keyboard`, `tx` (English/katakana text), `lang-toggle`, `game-bits`, `icon`
+- `src/fonts.css` + `public/fonts/` — self-hosted fonts (Fontsource woff2: Latin plus katakana slices only; `index.json` lists files for SW precache). If a word list/UI ever needs other Japanese glyphs, add the slices covering them and update `index.json`.
 - `public/sw.js` — service worker; precaches pages and every bundle in `q-manifest.json`. Bump `CACHE` (`manga-spell-vN`) when changing its caching logic.
 
 ## Deployment
