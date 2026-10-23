@@ -1,3 +1,22 @@
+# Manga Spelling ✨
+
+A spelling test PWA for the English statutory word lists (Years 3 & 4 and Years 5 & 6, 100 entries each), built with Qwik City.
+
+- **Two styles**: Kawaii (pastel, rounded, Mochi the bunny) and Kakkoii (ink black, speed lines, skewed yellow/red battle panels).
+- **English or katakana** interface — katakana mode uses manga words (スタート!, ドンマイ!, クリティカル!) with a small English gloss.
+- **Listen and spell**: words are read aloud with the browser's speech synthesis (British voice preferred), slowly, or in a sentence. On-screen keyboard plus physical keyboard support.
+- **Try again / reveal / success** screens with hints generated from the child's mistake, three tries per word.
+- **Heat map**: every word as a 10×10 grid, tricky letters within weak words, and weak spelling patterns over the last five goes.
+- **Offline**: `public/sw.js` precaches every page and Qwik bundle listed in `q-manifest.json`.
+
+Progress and settings are stored in `localStorage` only — nothing leaves the device.
+
+Word data lives in `src/data/words.ts`; word families such as *eight / eighth* count as one entry, matching the statutory lists.
+
+Run `npm run build` to produce the static site in `dist/`. It is deployed to <https://manga-spell.euans.space> by `.github/workflows/deploy.yml` on every push to `main`.
+
+---
+
 # Qwik City App ⚡️
 
 - [Qwik Docs](https://qwik.dev/)
@@ -62,4 +81,14 @@ The production build will generate client and server modules by running both cli
 
 ```shell
 npm run build # or `yarn build`
+```
+
+## Static Site Generator (Node.js)
+
+Be sure to configure your server to serve very long cache headers for the `build/**/*.js` files.
+
+Typically you'd set the `Cache-Control` header for those files to `public, max-age=31536000, immutable`.
+
+```shell
+npm run build.server
 ```

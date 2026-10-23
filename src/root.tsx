@@ -1,8 +1,13 @@
 import { component$, isDev } from "@builder.io/qwik";
 import { QwikCityProvider, RouterOutlet } from "@builder.io/qwik-city";
 import { RouterHead } from "./components/router-head/router-head";
+import { THEME_BOOT_SCRIPT } from "./lib/settings";
+import { AUDIO_UNLOCK_SCRIPT } from "./lib/sfx";
 
 import "./global.css";
+
+/** Registers the offline service worker in production builds */
+const SW_SCRIPT = `if("serviceWorker"in navigator)addEventListener("load",function(){navigator.serviceWorker.register("/sw.js")})`;
 
 export default component$(() => {
   /**
@@ -23,6 +28,9 @@ export default component$(() => {
           />
         )}
         <RouterHead />
+        <script dangerouslySetInnerHTML={THEME_BOOT_SCRIPT} />
+        <script dangerouslySetInnerHTML={AUDIO_UNLOCK_SCRIPT} />
+        {!isDev && <script dangerouslySetInnerHTML={SW_SCRIPT} />}
       </head>
       <body lang="en">
         <RouterOutlet />
