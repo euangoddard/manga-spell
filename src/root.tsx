@@ -10,6 +10,9 @@ import "./global.css";
 /** Registers the offline service worker in production builds */
 const SW_SCRIPT = `if("serviceWorker"in navigator)addEventListener("load",function(){navigator.serviceWorker.register("/sw.js")})`;
 
+/** Dev only: drops a service worker left on this origin by an earlier production build, which would intercept dev requests */
+const SW_CLEANUP_SCRIPT = `if("serviceWorker"in navigator)navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()});if(rs.length)caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})})})`;
+
 export default component$(() => {
   /**
    * The root of a QwikCity site always start with the <QwikCityProvider> component,
@@ -31,7 +34,9 @@ export default component$(() => {
         <RouterHead />
         <script dangerouslySetInnerHTML={THEME_BOOT_SCRIPT} />
         <script dangerouslySetInnerHTML={AUDIO_UNLOCK_SCRIPT} />
-        {!isDev && <script dangerouslySetInnerHTML={SW_SCRIPT} />}
+        <script
+          dangerouslySetInnerHTML={isDev ? SW_CLEANUP_SCRIPT : SW_SCRIPT}
+        />
       </head>
       <body lang="en">
         <RouterOutlet />

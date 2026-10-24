@@ -53,7 +53,8 @@
   --accent-soft: #2a2730;
   --line: #6b6670;
   --shadow: #d92b26;
-  --font-display: "Dela Gothic One", "Zen Kaku Gothic New", system-ui, sans-serif;
+  --font-display:
+    "Dela Gothic One", "Zen Kaku Gothic New", system-ui, sans-serif;
   --font-body: "Zen Kaku Gothic New", system-ui, sans-serif;
   --weight: 900;
   --radius: 0;
@@ -200,7 +201,10 @@ p {
 
 :root[data-mode="kakkoii"] .screen {
   background-color: #111014;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1.2px, transparent 1.7px);
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.1) 1.2px,
+    transparent 1.7px
+  );
   background-size: 8px 8px;
 }
 
@@ -1014,7 +1018,9 @@ p {
   border: 3px solid #4a2340;
   box-shadow: 0 6px 0 #4a2340;
   text-decoration: none;
-  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.08s ease;
 }
 
 .btn-main:active:not(:disabled) {
@@ -1197,8 +1203,49 @@ p {
 
 .listen-controls {
   display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.listen-controls__top {
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 16px;
+}
+
+/* The word's picture, framed as a manga panel (always light "paper") */
+.word-pic {
+  position: relative;
+  flex: 0 1 150px;
+  min-width: 0;
+  aspect-ratio: 1;
+  border: 3px solid #4a2340;
+  border-radius: 18px;
+  box-shadow: 0 5px 0 #4a2340;
+  background-color: #ffffff;
+  background-image: radial-gradient(#ffd3e5 1.4px, transparent 1.6px);
+  background-size: 9px 9px;
+  overflow: hidden;
+}
+
+.word-pic__img {
+  position: absolute;
+  inset: 6%;
+  width: 88%;
+  height: 88%;
+}
+
+:root[data-mode="kakkoii"] .word-pic {
+  border-radius: 0;
+  border-color: #f4f1ea;
+  box-shadow: 5px 5px 0 var(--accent);
+  background-color: #f4f1ea;
+  background-image: repeating-conic-gradient(
+    from 0deg at 50% 50%,
+    #e4dfd2 0deg 4deg,
+    transparent 4deg 18deg
+  );
 }
 
 .listen-controls__main {
@@ -1210,10 +1257,13 @@ p {
 }
 
 .listen-controls__side {
-  flex: 1;
   display: flex;
-  flex-direction: column;
   gap: 10px;
+}
+
+.listen-controls__side > .btn-soft {
+  flex: 1;
+  min-width: 0;
 }
 
 .play-btn {
@@ -1224,7 +1274,9 @@ p {
   border-radius: 50%;
   background: #c92a73;
   border: 4px solid #4a2340;
-  box-shadow: 0 6px 0 #4a2340, 0 0 0 9px #ffe1ee;
+  box-shadow:
+    0 6px 0 #4a2340,
+    0 0 0 9px #ffe1ee;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1376,7 +1428,8 @@ p {
 }
 
 .keyboard-dock {
-  margin: auto calc(-1 * var(--gutter)) calc(-1 * max(24px, env(safe-area-inset-bottom)));
+  margin: auto calc(-1 * var(--gutter))
+    calc(-1 * max(24px, env(safe-area-inset-bottom)));
 }
 
 .keyboard {
@@ -1898,11 +1951,31 @@ p {
 
 /* ---------- Heat map ---------- */
 
-.lv-0 { background: var(--lv-0); fill: var(--lv-0); color: var(--lv-fg-light); }
-.lv-1 { background: var(--lv-1); fill: var(--lv-1); color: var(--lv-fg-light); }
-.lv-2 { background: var(--lv-2); fill: var(--lv-2); color: var(--lv-fg-light); }
-.lv-3 { background: var(--lv-3); fill: var(--lv-3); color: var(--lv-fg-dark); }
-.lv-4 { background: var(--lv-4); fill: var(--lv-4); color: var(--lv-fg-dark); }
+.lv-0 {
+  background: var(--lv-0);
+  fill: var(--lv-0);
+  color: var(--lv-fg-light);
+}
+.lv-1 {
+  background: var(--lv-1);
+  fill: var(--lv-1);
+  color: var(--lv-fg-light);
+}
+.lv-2 {
+  background: var(--lv-2);
+  fill: var(--lv-2);
+  color: var(--lv-fg-light);
+}
+.lv-3 {
+  background: var(--lv-3);
+  fill: var(--lv-3);
+  color: var(--lv-fg-dark);
+}
+.lv-4 {
+  background: var(--lv-4);
+  fill: var(--lv-4);
+  color: var(--lv-fg-dark);
+}
 
 :root[data-mode="kakkoii"] .lv-2 {
   color: var(--lv-fg-light);
@@ -2039,7 +2112,9 @@ p {
 }
 
 .heat-cell[aria-pressed="true"] {
-  box-shadow: 0 0 0 3px #ffffff, 0 0 0 5.5px #4a2340;
+  box-shadow:
+    0 0 0 3px #ffffff,
+    0 0 0 5.5px #4a2340;
   position: relative;
   z-index: 1;
 }
@@ -2065,7 +2140,9 @@ p {
 }
 
 :root[data-mode="kakkoii"] .heat-cell[aria-pressed="true"] {
-  box-shadow: 0 0 0 2px #111014, 0 0 0 4.5px #f4f1ea;
+  box-shadow:
+    0 0 0 2px #111014,
+    0 0 0 4.5px #f4f1ea;
 }
 
 .legend {

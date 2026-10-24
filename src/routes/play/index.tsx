@@ -17,6 +17,7 @@ import { Heart, Icon, Sparkle } from "~/components/icon/icon";
 import { DELETE, ENTER, Keyboard } from "~/components/keyboard/keyboard";
 import { Mochi } from "~/components/mochi/mochi";
 import { Tx } from "~/components/tx/tx";
+import { WordPic } from "~/components/word-pic/word-pic";
 import { findForm, type SetId } from "~/data/words";
 import { feedback } from "~/lib/diff";
 import { celebrate, vibrate } from "~/lib/fx";
@@ -258,34 +259,37 @@ export default component$(() => {
           )}
 
           <div class="listen-controls">
-            <div class="listen-controls__main">
-              <button
-                type="button"
-                class="play-btn"
-                aria-label="Hear the word"
-                onClick$={() => sayWord(item.word)}
-              >
-                {!kawaii && (
-                  <svg
-                    class="play-btn__burst"
-                    viewBox="0 0 100 100"
-                    aria-hidden="true"
-                  >
-                    <polygon
-                      class="play-btn__shadow"
-                      transform="translate(4 4)"
-                      points={BURST}
-                    />
-                    <polygon class="play-btn__face" points={BURST} />
-                  </svg>
-                )}
-                <Icon
-                  name="speaker"
-                  size={kawaii ? 52 : 50}
-                  class="play-btn__icon"
-                />
-              </button>
-              <Tx k="play" class="play-label" />
+            <div class="listen-controls__top">
+              <WordPic id={item.id} />
+              <div class="listen-controls__main">
+                <button
+                  type="button"
+                  class="play-btn"
+                  aria-label="Hear the word"
+                  onClick$={() => sayWord(item.word)}
+                >
+                  {!kawaii && (
+                    <svg
+                      class="play-btn__burst"
+                      viewBox="0 0 100 100"
+                      aria-hidden="true"
+                    >
+                      <polygon
+                        class="play-btn__shadow"
+                        transform="translate(4 4)"
+                        points={BURST}
+                      />
+                      <polygon class="play-btn__face" points={BURST} />
+                    </svg>
+                  )}
+                  <Icon
+                    name="speaker"
+                    size={kawaii ? 52 : 50}
+                    class="play-btn__icon"
+                  />
+                </button>
+                <Tx k="play" class="play-label" />
+              </div>
             </div>
             <div class="listen-controls__side">
               <button

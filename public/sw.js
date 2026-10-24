@@ -7,13 +7,15 @@
  *   first visit, and re-synced whenever the manifest hash changes.
  * - Self-hosted fonts (/fonts): immutable files listed in /fonts/index.json,
  *   precached so every glyph slice works offline; cache first.
+ * - Word pictures (/img/words): SVGs listed in /img/words/index.json, precached
+ *   so every word's picture works offline; otherwise like other static files.
  * - Spoken audio (/audio): Polly clips listed in /audio/index.json, precached
  *   in the background so every word works offline; cache first. Served with
  *   Range support because iOS Safari won't play media without it.
  * - Other static files: stale-while-revalidate.
  */
 
-const CACHE = "manga-spell-v4";
+const CACHE = "manga-spell-v5";
 const PAGES = ["/", "/play/", "/map/"];
 const STATIC = [
   "/manifest.json",
@@ -76,6 +78,7 @@ self.addEventListener("install", (event) => {
       await cache.addAll([...PAGES, ...STATIC]);
       await syncBundles();
       await precacheDir("fonts").catch(() => undefined);
+      await precacheDir("img/words").catch(() => undefined);
       await self.skipWaiting();
       await precacheDir("audio").catch(() => undefined);
     })(),
@@ -106,9 +109,11 @@ async function networkFirst(event) {
       if (Date.now() - lastSync > 5 * 60 * 1000) {
         lastSync = Date.now();
         event.waitUntil(
-          Promise.all([syncBundles(), precacheDir("audio")]).catch(
-            () => undefined,
-          ),
+          Promise.all([
+            syncBundles(),
+            precacheDir("img/words"),
+            precacheDir("audio"),
+          ]).catch(() => undefined),
         );
       }
     }
