@@ -13,6 +13,8 @@ export default extendConfig(baseConfig, () => {
     plugins: [
       staticAdapter({
         origin: "https://manga-spell.euans.space",
+        // public/sitemap.xml is hand-written: only the home page is indexable
+        sitemapOutFile: null,
       }),
     ],
   };

@@ -1,4 +1,10 @@
-import { component$, useSignal, useStore, useTask$, useVisibleTask$ } from "@builder.io/qwik";
+import {
+  component$,
+  useSignal,
+  useStore,
+  useTask$,
+  useVisibleTask$,
+} from "@builder.io/qwik";
 import { Link, type DocumentHead } from "@builder.io/qwik-city";
 import { HomeLink } from "~/components/game-bits/game-bits";
 import { Icon } from "~/components/icon/icon";
@@ -79,7 +85,13 @@ export default component$(() => {
         <div class="topbar topbar--map">
           <HomeLink back />
           <div class="map-title">
-            <h1 class={kawaii ? "title-pop title-pop--small" : "title-slab title-slab--small"}>
+            <h1
+              class={
+                kawaii
+                  ? "title-pop title-pop--small"
+                  : "title-slab title-slab--small"
+              }
+            >
               <Tx k="mapTitle" />
             </h1>
           </div>
@@ -135,11 +147,20 @@ export default component$(() => {
                 ))}
               </div>
               <Tx k="high" class="legend__high" />
-              <span class="legend__swatch legend__swatch--none lv-none" aria-hidden="true" />
+              <span
+                class="legend__swatch legend__swatch--none lv-none"
+                aria-hidden="true"
+              />
               <Tx k="untried" class="legend__untried" />
             </div>
             <div class="selected" aria-live="polite">
-              <span class={["selected__swatch", selLevel < 0 ? "lv-none" : `lv-${selLevel}`]} aria-hidden="true" />
+              <span
+                class={[
+                  "selected__swatch",
+                  selLevel < 0 ? "lv-none" : `lv-${selLevel}`,
+                ]}
+                aria-hidden="true"
+              />
               <div class="selected__body">
                 <span class="selected__word">{sel.label}</span>
                 <span class="selected__note">{data.ready ? selNote : "…"}</span>
@@ -167,17 +188,31 @@ export default component$(() => {
               ) : (
                 weak.map(({ e }) => {
                   const heat = letterHeat(e, p.entries[e.id]);
-                  const form = e.forms.find((f) => f.word === heat.map((h) => h.ch).join("")) ?? e.forms[0];
+                  const form =
+                    e.forms.find(
+                      (f) => f.word === heat.map((h) => h.ch).join(""),
+                    ) ?? e.forms[0];
                   return (
                     <div key={e.id} class="weak-card">
-                      <div class="weak-card__letters" role="img" aria-label={`${form.word}: tricky letters highlighted`}>
+                      <div
+                        class="weak-card__letters"
+                        role="img"
+                        aria-label={`${form.word}: tricky letters highlighted`}
+                      >
                         {heat.map((h, i) => (
-                          <span key={i} class={["weak-letter", `lv-${h.level}`]} aria-hidden="true">
+                          <span
+                            key={i}
+                            class={["weak-letter", `lv-${h.level}`]}
+                            aria-hidden="true"
+                          >
                             {h.ch}
                           </span>
                         ))}
                       </div>
-                      <span class="weak-card__tip">{form.tip ?? `Say it slowly: ${form.syllables.join("‑")}.`}</span>
+                      <span class="weak-card__tip">
+                        {form.tip ??
+                          `Say it slowly: ${form.syllables.join("‑")}.`}
+                      </span>
                     </div>
                   );
                 })
@@ -205,14 +240,24 @@ export default component$(() => {
                     aria-label={`${pt.name}: ${pt.cells.map((c) => (c === null ? "not yet" : levelNames.en[c])).join(", ")}`}
                   >
                     {pt.cells.map((c, i) => (
-                      <span key={i} class={["pattern__cell", c === null ? "lv-none" : `lv-${c}`]} aria-hidden="true" />
+                      <span
+                        key={i}
+                        class={[
+                          "pattern__cell",
+                          c === null ? "lv-none" : `lv-${c}`,
+                        ]}
+                        aria-hidden="true"
+                      />
                     ))}
                   </div>
                 </div>
               ))}
             </section>
 
-            <Link href={`/play/?set=${tab.value}${weak.length ? "&focus=weak" : ""}`} class="btn-main">
+            <Link
+              href={`/play/?set=${tab.value}${weak.length ? "&focus=weak" : ""}`}
+              class="btn-main"
+            >
               <span class="btn-main__inner">
                 <Tx k="train" class="btn-main__label" />
               </span>
@@ -226,4 +271,12 @@ export default component$(() => {
 
 export const head: DocumentHead = {
   title: "Heat map · Manga Spelling",
+  meta: [
+    {
+      name: "description",
+      content:
+        "Your personal spelling heat map. See which Year 3–6 statutory words you know and which need more practice.",
+    },
+    { name: "robots", content: "noindex" },
+  ],
 };

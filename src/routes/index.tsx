@@ -20,14 +20,19 @@ const STYLES: { id: Mode; kana: string; label: string }[] = [
 
 export default component$(() => {
   const settings = useSettings();
-  const stats = useStore({ rank: "C", learnt: { y34: 0, y56: 0 } as Record<SetId, number> });
+  const stats = useStore({
+    rank: "C",
+    learnt: { y34: 0, y56: 0 } as Record<SetId, number>,
+  });
 
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(() => {
     const p = loadProgress();
     stats.rank = rankFor(p.power).name;
     for (const set of SETS) {
-      stats.learnt[set.id] = WORD_SETS[set.id].filter((e) => entryLevel(p.entries[e.id]) === 0).length;
+      stats.learnt[set.id] = WORD_SETS[set.id].filter(
+        (e) => entryLevel(p.entries[e.id]) === 0,
+      ).length;
     }
   });
 
@@ -147,7 +152,13 @@ export default component$(() => {
             </span>
           </Link>
           <Link href="/map/" class="btn-ghost">
-            <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" class="map-glyph">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              class="map-glyph"
+            >
               <rect x="3" y="3" width="8" height="8" class="lv-1" />
               <rect x="13" y="3" width="8" height="8" class="lv-4" />
               <rect x="3" y="13" width="8" height="8" class="lv-3" />
@@ -162,11 +173,12 @@ export default component$(() => {
 });
 
 export const head: DocumentHead = {
-  title: "Manga Spelling",
+  title: "Manga Spelling · Year 3–6 statutory spelling words",
   meta: [
     {
       name: "description",
-      content: "Practise the Year 3–6 statutory spelling words, manga style.",
+      content:
+        "Practise the Year 3–6 statutory spelling words with a free, playful spelling test. Kawaii or Kakkoii manga style, works offline, and your progress stays on your device.",
     },
   ],
 };

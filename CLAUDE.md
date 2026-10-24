@@ -24,6 +24,8 @@ Spelling-test PWA for the English statutory word lists (Years 3–6), built with
 - Custom-domain places that must stay in sync (no `CNAME` file: with Actions deploys the domain is set in repo settings, and a `CNAME` file is ignored):
   - `adapters/static/vite.config.ts` — `staticAdapter({ origin })`, used for the generated sitemap
   - `public/robots.txt` — `Sitemap:` URL
+  - `public/sitemap.xml` (hand-written; the adapter's generated sitemap is disabled) and `SITE` in `src/components/router-head/router-head.tsx` (canonical, Open Graph and JSON-LD URLs)
+- SEO: `router-head.tsx` emits description, canonical, Open Graph, Twitter card and JSON-LD (home only). `/play/` and `/map/` are `noindex` and left out of the sitemap. `public/og-image.png` is 1200×630.
 - The site is served from the domain root, so no Vite/Qwik `base` is set and all asset paths in the manifest, service worker and `<head>` are root-relative. Do not set a base path.
 - One-time manual setup (not in code): repo Settings → Pages → Source = **GitHub Actions**; Custom domain = `manga-spell.euans.space` with "Enforce HTTPS"; DNS for `euans.space` needs a `CNAME` record `manga-spell` → `euangoddard.github.io`.
 
