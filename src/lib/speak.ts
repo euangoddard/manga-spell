@@ -1,3 +1,6 @@
+import type { Word } from "~/data/words";
+import { audioName, type Clip } from "./audio";
+
 type VoicePredicate = (v: SpeechSynthesisVoice) => boolean;
 
 // Prefer a British voice: cloud en-GB → known good local en-GB voices → any en-GB
@@ -31,7 +34,7 @@ const waitForVoices = (): Promise<void> => {
 
 export const canSpeak = () => typeof window !== "undefined" && "speechSynthesis" in window;
 
-export const speak = async (text: string, rate = 0.9): Promise<void> => {
+const synthesize = async (text: string, rate = 0.9): Promise<void> => {
   if (!canSpeak()) return;
   await waitForVoices();
   const synth = window.speechSynthesis;
@@ -43,4 +46,35 @@ export const speak = async (text: string, rate = 0.9): Promise<void> => {
   const voice = pickVoice();
   if (voice) utterance.voice = voice;
   synth.speak(utterance);
+};
+
+// One element is reused so that iOS keeps it unlocked after the first tap
+let player: HTMLAudioElement | undefined;
+
+/** Resolves true once the clip has played to the end, false if it can't play. */
+const playClip = (name: string): Promise<boolean> => {
+  player ??= new Audio();
+  const audio = player;
+  audio.src = `/audio/${name}`;
+  return new Promise((resolve) => {
+    audio.onended = () => resolve(true);
+    audio.onerror = () => resolve(false);
+    audio.play().catch((err: unknown) => {
+      // Starting another clip aborts this one: leave it unresolved so nothing follows it
+      if ((err as DOMException).name !== "AbortError") resolve(false);
+    });
+  });
+};
+
+/** Says a word (or its slow / sentence variant) with the Polly clip, or the device voice if that fails */
+export const say = async (form: Word, clip?: Clip): Promise<void> => {
+  if (canSpeak()) window.speechSynthesis.cancel();
+  if (await playClip(audioName(form.word, clip))) return;
+  if (clip === "slow") return synthesize(form.word, 0.5);
+  return synthesize(clip === "sentence" ? `${form.word}. ${form.sentence}` : form.word);
+};
+
+/** Says each word in turn, e.g. both forms of a word family */
+export const sayAll = async (forms: Word[]): Promise<void> => {
+  for (const form of forms) await say(form);
 };

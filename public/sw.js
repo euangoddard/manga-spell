@@ -7,10 +7,13 @@
  *   first visit, and re-synced whenever the manifest hash changes.
  * - Self-hosted fonts (/fonts): immutable files listed in /fonts/index.json,
  *   precached so every glyph slice works offline; cache first.
+ * - Spoken audio (/audio): Polly clips listed in /audio/index.json, precached
+ *   in the background so every word works offline; cache first. Served with
+ *   Range support because iOS Safari won't play media without it.
  * - Other static files: stale-while-revalidate.
  */
 
-const CACHE = "manga-spell-v3";
+const CACHE = "manga-spell-v4";
 const PAGES = ["/", "/play/", "/map/"];
 const STATIC = [
   "/manifest.json",
@@ -20,16 +23,19 @@ const STATIC = [
   "/icons/icon-512.png",
 ];
 
-async function precacheFonts() {
+// Precaches the files named in /<dir>/index.json, in chunks so one failure doesn't drop the lot
+async function precacheDir(dir) {
   const cache = await caches.open(CACHE);
-  const res = await fetch("/fonts/index.json");
+  const res = await fetch(`/${dir}/index.json`);
   if (!res.ok) return;
-  const files = (await res.json()).map((f) => `/fonts/${f}`);
+  const files = (await res.json()).map((f) => `/${dir}/${f}`);
   const missing = [];
   for (const url of files) {
     if (!(await cache.match(url))) missing.push(url);
   }
-  await cache.addAll(missing);
+  for (let i = 0; i < missing.length; i += 40) {
+    await cache.addAll(missing.slice(i, i + 40)).catch(() => undefined);
+  }
 }
 
 async function syncBundles() {
@@ -53,7 +59,10 @@ async function syncBundles() {
   const current = new Set(urls);
   for (const req of await cache.keys()) {
     const path = new URL(req.url).pathname;
-    if ((path.startsWith("/build/") || path.startsWith("/assets/")) && !current.has(path)) {
+    if (
+      (path.startsWith("/build/") || path.startsWith("/assets/")) &&
+      !current.has(path)
+    ) {
       await cache.delete(req);
     }
   }
@@ -66,8 +75,9 @@ self.addEventListener("install", (event) => {
       const cache = await caches.open(CACHE);
       await cache.addAll([...PAGES, ...STATIC]);
       await syncBundles();
-      await precacheFonts().catch(() => undefined);
+      await precacheDir("fonts").catch(() => undefined);
       await self.skipWaiting();
+      await precacheDir("audio").catch(() => undefined);
     })(),
   );
 });
@@ -95,7 +105,11 @@ async function networkFirst(event) {
       // Pick up a new deploy's bundles at most every few minutes
       if (Date.now() - lastSync > 5 * 60 * 1000) {
         lastSync = Date.now();
-        event.waitUntil(syncBundles().catch(() => undefined));
+        event.waitUntil(
+          Promise.all([syncBundles(), precacheDir("audio")]).catch(
+            () => undefined,
+          ),
+        );
       }
     }
     return res;
@@ -117,12 +131,46 @@ async function cacheFirst(request) {
   return res;
 }
 
+async function audio(request) {
+  const cache = await caches.open(CACHE);
+  let res = await cache.match(request.url);
+  if (!res) {
+    // Fetch the whole file (not the range) so it can be cached
+    res = await fetch(request.url);
+    if (!res.ok) return res;
+    await cache.put(request.url, res.clone());
+  }
+  const range = /^bytes=(\d*)-(\d*)$/.exec(request.headers.get("range") ?? "");
+  if (!range) return res;
+  const buf = await res.arrayBuffer();
+  const size = buf.byteLength;
+  const start = range[1] ? Number(range[1]) : size - Number(range[2]);
+  const end =
+    range[1] && range[2] ? Math.min(Number(range[2]), size - 1) : size - 1;
+  if (!(start >= 0 && start <= end)) {
+    return new Response(null, {
+      status: 416,
+      headers: { "Content-Range": `bytes */${size}` },
+    });
+  }
+  return new Response(buf.slice(start, end + 1), {
+    status: 206,
+    headers: {
+      "Content-Type": "audio/mpeg",
+      "Content-Length": String(end - start + 1),
+      "Content-Range": `bytes ${start}-${end}/${size}`,
+      "Accept-Ranges": "bytes",
+    },
+  });
+}
+
 async function staleWhileRevalidate(event) {
   const cache = await caches.open(CACHE);
   const cached = await cache.match(event.request, { ignoreSearch: true });
   const fresh = fetch(event.request)
     .then(async (res) => {
-      if (res.ok || res.type === "opaque") await cache.put(event.request, res.clone());
+      if (res.ok || res.type === "opaque")
+        await cache.put(event.request, res.clone());
       return res;
     })
     .catch(() => cached);
@@ -141,6 +189,11 @@ self.addEventListener("fetch", (event) => {
 
   if (request.mode === "navigate") {
     event.respondWith(networkFirst(event));
+  } else if (
+    url.pathname.startsWith("/audio/") &&
+    url.pathname.endsWith(".mp3")
+  ) {
+    event.respondWith(audio(request));
   } else if (
     url.pathname.startsWith("/build/") ||
     url.pathname.startsWith("/assets/") ||

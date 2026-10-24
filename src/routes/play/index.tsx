@@ -24,7 +24,8 @@ import { playSfx } from "~/lib/sfx";
 import { buildHint } from "~/lib/hints";
 import { pickRound, rankFor, recordGo, recordMiss } from "~/lib/progress";
 import { loadSettings, useSettings } from "~/lib/settings";
-import { speak } from "~/lib/speak";
+import type { Clip } from "~/lib/audio";
+import { say } from "~/lib/speak";
 
 const ROUND_SIZE = 10;
 const MAX_TRIES = 3;
@@ -58,7 +59,7 @@ interface Game {
   power: number;
 }
 
-const sayWord = (word: string) => speak(word);
+const sayWord = (word: string, clip?: Clip) => say(findForm(word)!, clip);
 
 export default component$(() => {
   const settings = useSettings();
@@ -290,7 +291,7 @@ export default component$(() => {
               <button
                 type="button"
                 class="btn-soft"
-                onClick$={() => speak(item.word, 0.5)}
+                onClick$={() => sayWord(item.word, "slow")}
               >
                 <Icon
                   name={kawaii ? "snail" : "timer"}
@@ -301,7 +302,7 @@ export default component$(() => {
               <button
                 type="button"
                 class="btn-soft"
-                onClick$={() => speak(`${item.word}. ${form.sentence}`)}
+                onClick$={() => sayWord(item.word, "sentence")}
               >
                 <Icon name="sentence" class="btn-soft__icon" />
                 <Tx k="sentence" />

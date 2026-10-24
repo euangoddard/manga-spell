@@ -15,7 +15,8 @@ Spelling-test PWA for the English statutory word lists (Years 3–6), built with
 - `src/lib/` — `settings.ts` and `progress.ts` (both `localStorage`, keys prefixed `manga-spell:`)
 - `src/components/` — `mochi`, `keyboard`, `tx` (English/katakana text), `lang-toggle`, `game-bits`, `icon`
 - `src/fonts.css` + `public/fonts/` — self-hosted fonts (Fontsource woff2: Latin plus katakana slices only; `index.json` lists files for SW precache). If a word list/UI ever needs other Japanese glyphs, add the slices covering them and update `index.json`.
-- `public/sw.js` — service worker; precaches pages and every bundle in `q-manifest.json`. Bump `CACHE` (`manga-spell-vN`) when changing its caching logic.
+- `public/audio/` — pre-rendered speech (Amazon Polly, neural, en-GB "Arthur", eu-west-1), committed to the repo; `index.json` lists files for SW precache. Per word form: `<word>.mp3`, `<word>-slow.mp3`, `<word>-sentence.mp3` (names via `src/lib/audio.ts`). After adding or changing words/sentences run `node scripts/generate-audio.mjs` (needs AWS CLI credentials; skips existing files, `--force` regenerates). `src/lib/speak.ts` plays the clips and falls back to browser speech synthesis if one can't play. Hints/tips are text only and not voiced.
+- `public/sw.js` — service worker; precaches pages, every bundle in `q-manifest.json`, fonts and audio. Audio is served with `Range` support (iOS Safari needs it). Bump `CACHE` (`manga-spell-vN`) when changing its caching logic.
 
 ## Deployment
 

@@ -19,7 +19,7 @@ import {
   type Progress,
 } from "~/lib/progress";
 import { useSettings } from "~/lib/settings";
-import { speak } from "~/lib/speak";
+import { sayAll } from "~/lib/speak";
 import { LEVELS } from "~/lib/strings";
 
 const TABS: { id: SetId; label: string }[] = [
@@ -169,7 +169,7 @@ export default component$(() => {
                 type="button"
                 class="round-btn round-btn--small"
                 aria-label={`Hear ${sel.label}`}
-                onClick$={() => speak(sel.forms.map((f) => f.word).join(", "))}
+                onClick$={() => sayAll(sel.forms)}
               >
                 <Icon name="speakerSmall" size={20} />
               </button>
